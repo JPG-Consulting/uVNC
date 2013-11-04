@@ -56,7 +56,11 @@ void InitIpp();
 
 // Application instance and name
 HINSTANCE	hAppInstance;
+#if !_REMOTE_SUPPORT
 const char	*szAppName = "WinVNC";
+#else
+const char	*szAppName = "WinVNCRemoteSupport";
+#endif
 DWORD		mainthreadId;
 BOOL		fRunningFromExternalService=false;
 
