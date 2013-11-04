@@ -142,6 +142,7 @@ vncProperties::Init(vncServer *server)
 	LoadFromIniFile();
 #endif
 
+#if !_REMOTE_SUPPORT
 	// If the password is empty then always show a dialog
 	char passwd[MAXPWLEN];
 	m_server->GetPassword(passwd);
@@ -180,6 +181,7 @@ vncProperties::Init(vncServer *server)
 				}
 			}
 	}
+#endif
 	Lock_service_helper=false;
 	return TRUE;
 }
