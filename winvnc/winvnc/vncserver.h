@@ -404,8 +404,10 @@ public:
 	void _actualTimerRetryHandler();
 
 	// sf@2007 - Vista / XP FUS special modes
+#if !_REMOTE_SUPPORT
 	virtual BOOL RunningFromExternalService(){return m_fRunningFromExternalService;};
 	virtual void RunningFromExternalService(BOOL fEnabled){m_fRunningFromExternalService = fEnabled;};
+#endif
 
 	virtual void AutoRestartFlag(BOOL fOn){m_fAutoRestart = fOn;};
 	virtual BOOL AutoRestartFlag(){return m_fAutoRestart;};
@@ -599,7 +601,9 @@ protected:
 	char m_szAutoReconnectId[MAX_PATH];
 
 	// sf@2007
+#if !_REMOTE_SUPPORT
 	BOOL m_fRunningFromExternalService;
+#endif
 	BOOL m_fAutoRestart;
 
 	// sf@2005 - FTUserImpersonation

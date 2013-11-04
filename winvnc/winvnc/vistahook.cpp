@@ -262,6 +262,7 @@ DWORD WINAPI Cadthread(LPVOID lpParam)
 	}
 	}
 
+#if !_REMOTE_SUPPORT
 	//////
 	if(OSversion.dwMajorVersion>=6 && vncService::RunningAsService())
 			{
@@ -413,6 +414,8 @@ DWORD WINAPI Cadthread(LPVOID lpParam)
 					}
 			}
        /////////////////////
+#endif
+
 	if(OSversion.dwMajorVersion==6)//&& OSversion.dwMinorVersion>=1) //win7  // test win7 +Vista
 	{
 

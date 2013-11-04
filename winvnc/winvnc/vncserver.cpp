@@ -231,7 +231,9 @@ vncServer::vncServer()
 
 	m_impersonationtoken=NULL; // Modif Jeremy C. 
 
+#if !_REMOTE_SUPPORT
 	m_fRunningFromExternalService = false;
+#endif
 	m_fAutoRestart = false;
     m_ftTimeout = FT_RECV_TIMEOUT;
     m_keepAliveInterval = KEEPALIVE_INTERVAL;
@@ -2388,7 +2390,11 @@ BOOL vncServer::SetDSMPlugin(BOOL bForceReload)
 		// The second parameter tells the plugin the kind of program is using it
 		// (in WinVNC : "server-app" or "server-svc"
 		strcat(szParams, ",");
+#if !_REMOTE_SUPPORT
 		strcat(szParams, vncService::RunningAsService() ? "server-svc" : "server-app");
+#else
+		strcat(szParams, "server-app");
+#endif
 
 		//::MessageBoxSecure(NULL, szParams, "SetDSMPlugin info", MB_OK);
 

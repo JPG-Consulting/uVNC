@@ -737,6 +737,7 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 		strncat(m_nid.szTip, namebuf, strlen(namebuf));
     }
 
+#if !_REMOTE_SUPPORT
 	if (vncService::RunningAsService())
 	{
 		strncat(m_nid.szTip, " - service - ", strlen(" - service - "));
@@ -745,6 +746,9 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 	{
 		strncat(m_nid.szTip, " - application - ", strlen(" - application - "));
 	}
+#else
+	strncat(m_nid.szTip, " - application - ", strlen(" - application - "));
+#endif
 	strncat(m_nid.szTip, g_hookstring, strlen(g_hookstring));
 
 //	vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call\n"));
@@ -854,6 +858,14 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 	} else {
 
 //		vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call FAILED ( %u ) \n"), 0);
+#if _REMOTE_SUPPORT
+		if (msg == NIM_ADD)
+			{
+				//Do not display Properties pages when running in Application0 mode
+				m_properties.ShowAdmin(TRUE, TRUE);
+				PostQuitMessage(0);
+			}
+#else
 		if (!vncService::RunningAsService())
 		{
 //			//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::SendTrayMsg - Shell_NotifyIcon call FAILED NOT runasservice\n"));
@@ -880,6 +892,7 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 			vnclog.Print(LL_INTINFO, VNCLOG("Failed IsIconSet \n"));
 			}
 		}
+#endif
 	}
 }
 
@@ -909,6 +922,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 	//	Beep(100,10);
 	//	vnclog.Print(LL_INTINFO, VNCLOG("iMsg 0x%x \n"),iMsg);
 
+#if !_REMOTE_SUPPORT
 	 if (iMsg==WM_TASKBARCREATED)
 	 {
 		 if (_this->m_server->RunningFromExternalService())
@@ -925,6 +939,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				PostQuitMessage(0);
 			}
 	 }
+#endif
 
 	switch (iMsg)
 	{
@@ -949,7 +964,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 
 		//vnclog.Print(LL_INTERR, VNCLOG("########### vncMenu::TIMER TrayIcon 5s hack\n"));
-
+#if !_REMOTE_SUPPORT
 		if (_this->m_server->RunningFromExternalService())
 			{
 				strcpy(newuser,"");
@@ -981,6 +996,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				// Trigger a check of the current user
 				PostMessage(hwnd, WM_USERCHANGED, 0, 0);
 			}
+#endif
 		// Update the icon
 		_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
 		break;

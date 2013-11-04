@@ -54,7 +54,10 @@ DWORD	g_platform_id;
 BOOL	g_impersonating_user = 0;
 DWORD	g_version_major;
 DWORD	g_version_minor;
+
+#if !_REMOTE_SUPPORT
 BOOL	m_fRunningFromExternalService = false;
+#endif
 
 typedef DWORD (WINAPI* pWTSGetActiveConsoleSessionId)(VOID);
 typedef BOOL (WINAPI * pProcessIdToSessionId)(DWORD,DWORD*);
@@ -237,6 +240,7 @@ vncService::vncService()
 BOOL
 GetCurrentUser(char *buffer, UINT size) // RealVNC 336 change
 {	
+#if !_REMOTE_SUPPORT
 	if (vncService::RunningFromExternalService())
 	{
 //		vnclog.Print(LL_INTERR, VNCLOG("@@@@@@@@@@@@@ GetCurrentUser - Forcing g_impersonating_user \n"));
@@ -295,7 +299,8 @@ GetCurrentUser(char *buffer, UINT size) // RealVNC 336 change
 			return TRUE;
 		}
 	}
-		
+#endif
+
 	// -=- When we reach here, we're either running under Win9x, or we're running
 	//     under NT as an application or as a service impersonating a user
 	// Either way, we should find a suitable user name.
@@ -348,9 +353,14 @@ BOOL
 vncService::CurrentUser(char *buffer, UINT size)
 {
   BOOL result = GetCurrentUser(buffer, size);
+#if !_REMOTE_SUPPORT
   if (result && (strcmp(buffer, "") == 0) && !vncService::RunningAsService()) {
+#else
+  if (result && (strcmp(buffer, "") == 0)) {
+#endif
     strncpy(buffer, "Default", size);
   }
+
   return result;
 }
 
@@ -649,6 +659,7 @@ vncService::InputDesktopSelected()
 		// *** I think this is horribly inefficient but I'm not sure.
 		if (inputdesktop == NULL)
 		{
+#if !_REMOTE_SUPPORT
 			//Running as SC we want to keep the viewer open in case UAC or screensaver jump in
 			if (!m_fRunningFromExternalService)return 2;
 			DWORD lasterror;
@@ -658,6 +669,10 @@ vncService::InputDesktopSelected()
 			if (lasterror==624) return TRUE;
 			vnclog.Print(LL_INTERR, VNCLOG("OpenInputDesktop II\n"));
 			return 0;
+#else
+			//Running as Remote support we want to keep the viewer open in case UAC or screensaver jump in
+			return 2;
+#endif
 		}
 
 		DWORD dummy;
@@ -668,18 +683,28 @@ vncService::InputDesktopSelected()
 			if (!CloseDesktop(inputdesktop))
 				vnclog.Print(LL_INTERR, VNCLOG("failed to close input desktop\n"));
 			vnclog.Print(LL_INTERR, VNCLOG("!GetUserObjectInformation(threaddesktop\n"));
+#if !_REMOTE_SUPPORT
 			//Running as SC we want to keep the viewer open in case UAC or screensaver jump in
 			if (!m_fRunningFromExternalService)return 2;
 			return 0;
+#else
+			//Running as Remote Support we want to keep the viewer open in case UAC or screensaver jump in
+			return 2;
+#endif
 		}
 		assert(dummy <= 256);
 		if (!GetUserObjectInformation(inputdesktop, UOI_NAME, &inputname, 256, &dummy)) {
 			if (!CloseDesktop(inputdesktop))
 				vnclog.Print(LL_INTERR, VNCLOG("failed to close input desktop\n"));
 			vnclog.Print(LL_INTERR, VNCLOG("!GetUserObjectInformation(inputdesktop\n"));
+#if !_REMOTE_SUPPORT
 			//Running as SC we want to keep the viewer open in case UAC or screensaver jump in
 			if (!m_fRunningFromExternalService)return 2;
 			return 0;
+#else
+			//Running as Remote Support we want to keep the viewer open in case UAC or screensaver jump in
+			return 2;
+#endif
 		}
 		assert(dummy <= 256);
 
@@ -689,9 +714,14 @@ vncService::InputDesktopSelected()
 		if (strcmp(threadname, inputname) != 0)
 		{
 			vnclog.Print(LL_INTERR, VNCLOG("threadname, inputname differ\n"));
+#if !_REMOTE_SUPPORT
 			//Running as SC we want to keep the viewer open in case UAC or screensaver jump in
 			if (!m_fRunningFromExternalService)return 2;
-		   return 0;
+		    return 0;
+#else
+			//Running as Remote Support we want to keep the viewer open in case UAC or screensaver jump in
+			return 2;
+#endif
 		}	
 	}
 
@@ -909,6 +939,7 @@ vncService::PostAddConnectClient( const char* pszId )
 	return ( PostToWinVNC(MENU_REPEATER_ID_MSG, 0, (LPARAM)aId) );
 }
 
+#if !_REMOTE_SUPPORT
 BOOL
 vncService::RunningAsService()
 {
@@ -950,5 +981,6 @@ vncService::IsInstalled()
     }
     return (FALSE != bResult);
 }
+#endif
 
 

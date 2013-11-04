@@ -609,7 +609,11 @@ vncSetAuth::DialogProc(HWND hwnd,
 				GetDlgItemText(hwnd, IDC_GROUP3, (LPSTR) _this->pszgroup3, 240);
 
 				bool use_uac=false;
+#if !_REMOTE_SUPPORT
 				if (!_this->myIniFile.IsWritable() || vncService::RunningAsService() )
+#else
+				if (!_this->myIniFile.IsWritable())
+#endif
 				{
 					// We can't write to the ini file , Vista in service mode
 					if (!Copy_to_Temp(_this->m_Tempfile))

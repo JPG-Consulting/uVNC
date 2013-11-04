@@ -250,8 +250,6 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 		if (vncService::RunningAsService()) usersettings=false;
 		m_usersettings=usersettings;
 	}
-#else
-	m_usersettings=false;
 #endif
 
 	if (show)
@@ -1385,7 +1383,11 @@ vncProperties::DialogProc(HWND hwnd,
 						// (specific params saving and so on...)
 						char szParams[32];
 						strcpy(szParams, "NoPassword,");
+#if !_REMOTE_SUPPORT
 						strcat(szParams, vncService::RunningAsService() ? "server-svc" : "server-app");
+#else
+						strcat(szParams, "server-app");
+#endif
 						//adzm 2010-05-12 - dsmplugin config
 						char* szNewConfig = NULL;
 						if (_this->m_server->GetDSMPluginPointer()->SetPluginParams(hwnd, szParams, _this->m_pref_DSMPluginConfig, &szNewConfig)) {
@@ -1640,6 +1642,7 @@ vncProperties::Load(BOOL usersettings)
 	//}
 	ResetRegistry();
 
+#if !_REMOTE_SUPPORT
 	if (vncService::RunningAsService()) usersettings=false;
 
 	// sf@2007 - Vista mode
@@ -1649,14 +1652,17 @@ vncProperties::Load(BOOL usersettings)
 	// Todo: Maybe we should additionally check OS version...
 	if (m_server->RunningFromExternalService())
 		usersettings=false;
+#endif
 
 	m_usersettings = usersettings;
 
+#if !_REMOTE_SUPPORT
 	if (m_usersettings)
 		vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - User mode\n"));
 	else
 		vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Service mode\n"));
-	
+#endif
+
 	char username[UNLEN+1];
 	HKEY hkLocal, hkLocalUser, hkDefault;
 	DWORD dw;
@@ -2475,7 +2481,11 @@ void vncProperties::SaveToIniFile()
 		return;
 
 	// SAVE PER-USER PREFS IF ALLOWED
+#if !_REMOTE_SUPPORT
 	if (!myIniFile.IsWritable()  || vncService::RunningAsService())
+#else
+	if (!myIniFile.IsWritable())
+#endif
 			{
 				//First check if temp file is writable
 				myIniFile.IniFileSetTemp( m_Tempfile);

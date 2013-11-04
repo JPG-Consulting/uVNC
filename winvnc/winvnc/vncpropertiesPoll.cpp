@@ -245,13 +245,18 @@ vncPropertiesPoll::Show(BOOL show, BOOL usersettings)
 			}
 
 			// Load in all the settings
+#if !_REMOTE_SUPPORT
 			if (!vncService::RunningAsService())
 			{
-			if (m_fUseRegistry) 
-				Load(TRUE);
-			else
-				LoadFromIniFile();
+				if (m_fUseRegistry) 
+					Load(TRUE);
+				else
+					LoadFromIniFile();
 			}
+#else
+			// Remote support always loads INI file
+			LoadFromIniFile();
+#endif
 		}
 	}
 	if(iImpersonateResult == ERROR_SUCCESS)RevertToSelf();

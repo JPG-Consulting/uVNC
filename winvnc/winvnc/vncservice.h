@@ -63,9 +63,11 @@ public:
 	static DWORD VersionMajor();
 	static DWORD VersionMinor();
 
+#if !_REMOTE_SUPPORT
 	// Routine to establish whether the current instance is running
 	// as a service or not
 	static BOOL RunningAsService();
+#endif
 
 	// Routine to kill any other running copy of WinVNC
 	static BOOL KillRunningCopy();
@@ -113,10 +115,11 @@ public:
 	static BOOL PostAddStopConnectClient();
 	static BOOL PostAddStopConnectClientAll();
 
+#if !_REMOTE_SUPPORT
 	static BOOL RunningFromExternalService();
 	static void RunningFromExternalService(BOOL fEnabled);
 	static bool IsInstalled();
-
+#endif
 };
 
 #endif

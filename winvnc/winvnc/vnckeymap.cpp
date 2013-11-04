@@ -712,6 +712,7 @@ public:
 		vnclog.Print(LL_INTINFO,
                  "CAD\n");
 		// If running under Vista and started from Session0 in Application mode
+#if !_REMOTE_SUPPORT
 		if (vncService::VersionMajor()>=6 && vncService::RunningFromExternalService() )
 		{
 			      vnclog.Print(LL_INTINFO,
@@ -724,17 +725,22 @@ public:
 				CloseHandle(ThreadHandle2);
 		}
 		else if (vncService::VersionMajor()>=6)
+#else
+		if (vncService::VersionMajor()>=6)
+#endif
 		{
 			vnclog.Print(LL_INTINFO,
                  "Vista and runnning as user -> Taskmgr\n");
 			WinExec("taskmgr.exe", SW_SHOWNORMAL);
 		}
+#if !_REMOTE_SUPPORT
 		else if (vncService::VersionMajor()<6 && vncService::RunningFromExternalService() )
 		{
 			vnclog.Print(LL_INTINFO,
                  "Not Vista and runnning as system, use old method\n");
 			vncService::SimulateCtrlAltDel();
 		}
+#endif
 		else if (vncService::VersionMajor()<6)
 		{
 			vnclog.Print(LL_INTINFO,

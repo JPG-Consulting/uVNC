@@ -583,10 +583,12 @@ bool GetServiceName(TCHAR *pszAppPath, TCHAR *pszServiceName)
 }
 #endif
 
-// TODO: Remote support shouldn't have Running from external service
+#if !_REMOTE_SUPPORT
 extern BOOL	m_fRunningFromExternalService;
+#endif
 DWORD MessageBoxSecure(HWND hWnd,LPCTSTR lpText,LPCTSTR lpCaption,UINT uType)
 {
+#if !_REMOTE_SUPPORT
 	DWORD retunvalue;
 	if (m_fRunningFromExternalService)
 	{
@@ -608,4 +610,7 @@ DWORD MessageBoxSecure(HWND hWnd,LPCTSTR lpText,LPCTSTR lpCaption,UINT uType)
 		retunvalue=MessageBox(hWnd,lpText,lpCaption,uType);
 	}
 	return retunvalue;
+#else
+	return MessageBox(hWnd,lpText,lpCaption,uType);
+#endif
 }

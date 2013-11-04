@@ -62,7 +62,10 @@ const char	*szAppName = "WinVNC";
 const char	*szAppName = "WinVNCRemoteSupport";
 #endif
 DWORD		mainthreadId;
+
+#if !_REMOTE_SUPPORT
 BOOL		fRunningFromExternalService=false;
+#endif
 
 //adzm 2009-06-20
 char* g_szRepeaterHost = NULL;
@@ -610,12 +613,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			continue;
 		}
 
+#if !_REMOTE_SUPPORT
 		if (strncmp(&szCmdLine[i], winvnchttp, strlen(winvnchttp)) == 0)
 		{
 			G_HTTP=true;
 			i+=strlen(winvnchttp);
 			continue;
 		}
+#endif
 
 		if (strncmp(&szCmdLine[i], winvncStopReconnect, strlen(winvncStopReconnect)) == 0)
 		{
@@ -1045,8 +1050,12 @@ int WinVNCAppMain()
 		{
     		vnclog.Print(LL_INTINFO, VNCLOG("%s -- exiting\n"), sz_ID_ANOTHER_INST);
 			// We don't allow multiple instances!
+#if !_REMOTE_SUPPORT
 			if (!fRunningFromExternalService)
 				MessageBoxSecure(NULL, sz_ID_ANOTHER_INST, szAppName, MB_OK);
+#else
+			MessageBoxSecure(NULL, sz_ID_ANOTHER_INST, szAppName, MB_OK);
+#endif
 			return 0;
 		}
 	}
@@ -1060,8 +1069,10 @@ int WinVNCAppMain()
 	vnclog.Print(LL_STATE, VNCLOG("server created ok\n"));
 	///uninstall driver before cont
 
+#if !_REMOTE_SUPPORT
 	// sf@2007 - Set Application0 special mode
 	server.RunningFromExternalService(fRunningFromExternalService);
+#endif
 
 	// sf@2007 - New impersonation thread stuff for tray icon & menu
 	// Subscribe to shutdown event

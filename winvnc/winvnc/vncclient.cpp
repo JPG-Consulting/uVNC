@@ -2268,8 +2268,12 @@ vncClientThread::run(void *arg)
 	}
 
 	strcat(desktopname, " - ");
+#if !_REMOTE_SUPPORT
 	if (vncService::RunningAsService()) strcat(desktopname, "service mode");
 	else strcat(desktopname, "application mode");
+#else
+	strcat(desktopname, "application mode");
+#endif
 
 	// Send the server format message to the client
 	rfbServerInitMsg server_ini;
@@ -6096,8 +6100,12 @@ bool vncClient::DoFTUserImpersonation()
 		}
 		*/
 		
+#if !_REMOTE_SUPPORT
 		if (!vncService::RunningAsService())
 			fUserOk = true;
+#else
+		fUserOk = true;
+#endif
 	}
 	else
 	{
