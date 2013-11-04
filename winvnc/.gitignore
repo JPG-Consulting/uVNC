@@ -2,3 +2,5 @@
 /RemoteSupport (Debug)/
 /*.suo
 /*.ncb
+/Release/
+/RemoteSupport (Release)/
