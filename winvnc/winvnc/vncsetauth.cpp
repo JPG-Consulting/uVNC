@@ -41,6 +41,7 @@ const TCHAR REGISTRY_KEY [] = "Software\\UltraVNC";
 // [v1.0.2-jp1 fix] Load resouce from dll
 extern HINSTANCE	hInstResDLL;
 
+#if !_REMOTE_SUPPORT
 void
 vncSetAuth::OpenRegistry()
 {
@@ -72,10 +73,12 @@ vncSetAuth::CloseRegistry()
 		if (hkLocal != NULL) RegCloseKey(hkLocal);
 	}
 }
+#endif
 
 LONG
 vncSetAuth::LoadInt(HKEY key, LPCSTR valname, LONG defval)
 {
+#if !_REMOTE_SUPPORT
 	if (m_fUseRegistry)
 	{
 		LONG pref;
@@ -102,11 +105,15 @@ vncSetAuth::LoadInt(HKEY key, LPCSTR valname, LONG defval)
 	{
 		return myIniFile.ReadInt("admin_auth", (char *)valname, defval);
 	}
+#else
+	return myIniFile.ReadInt("admin_auth", (char *)valname, defval);
+#endif
 }
 
 TCHAR *
 vncSetAuth::LoadString(HKEY key, LPCSTR keyname)
 {
+#if !_REMOTE_SUPPORT
 	if (m_fUseRegistry)
 	{
 		DWORD type = REG_SZ;
@@ -154,11 +161,17 @@ vncSetAuth::LoadString(HKEY key, LPCSTR keyname)
 		myIniFile.ReadString("admin_auth", (char *)keyname,authhosts,150);
 		return (TCHAR *)authhosts;
 	}
+#else
+	TCHAR *authhosts=new char[150];
+	myIniFile.ReadString("admin_auth", (char *)keyname,authhosts,150);
+	return (TCHAR *)authhosts;
+#endif
 }
 
 void
 vncSetAuth::SaveInt(HKEY key, LPCSTR valname, LONG val)
 {
+#if !_REMOTE_SUPPORT
 	if (m_fUseRegistry)
 	{
 		RegSetValueEx(key, valname, 0, REG_DWORD, (LPBYTE) &val, sizeof(val));
@@ -167,11 +180,15 @@ vncSetAuth::SaveInt(HKEY key, LPCSTR valname, LONG val)
 	{
 		myIniFile.WriteInt("admin_auth", (char *)valname, val);
 	}
+#else
+	myIniFile.WriteInt("admin_auth", (char *)valname, val);
+#endif
 }
 
 void
 vncSetAuth::SaveString(HKEY key,LPCSTR valname, TCHAR *buffer)
 {
+#if !_REMOTE_SUPPORT
 	if (m_fUseRegistry)
 	{
 		RegSetValueEx(key, valname, 0, REG_BINARY, (LPBYTE) buffer, MAXSTRING);
@@ -180,11 +197,15 @@ vncSetAuth::SaveString(HKEY key,LPCSTR valname, TCHAR *buffer)
 	{
 		myIniFile.WriteString("admin_auth", (char *)valname,buffer);
 	}
+#else
+	myIniFile.WriteString("admin_auth", (char *)valname,buffer);
+#endif
 }
 
 void
 vncSetAuth::savegroup1(TCHAR *value)
 {
+#if !_REMOTE_SUPPORT
 	if (m_fUseRegistry)
 	{
 		OpenRegistry();
@@ -195,10 +216,14 @@ vncSetAuth::savegroup1(TCHAR *value)
 	{
 		SaveString(hkDefault, "group1", value);
 	}
+#else
+	SaveString(hkDefault, "group1", value);
+#endif
 }
 TCHAR*
 vncSetAuth::Readgroup1()
 {
+#if !_REMOTE_SUPPORT
 	if (m_fUseRegistry)
 	{
 		TCHAR *value=NULL;
@@ -213,11 +238,17 @@ vncSetAuth::Readgroup1()
 		value=LoadString (hkDefault, "group1");
 		return value;
 	}
+#else
+	TCHAR *value=NULL;
+	value=LoadString (hkDefault, "group1");
+	return value;
+#endif
 }
 
 void
 vncSetAuth::savegroup2(TCHAR *value)
 {
+#if !_REMOTE_SUPPORT
 	if (m_fUseRegistry)
 	{
 		OpenRegistry();
@@ -228,10 +259,14 @@ vncSetAuth::savegroup2(TCHAR *value)
 	{
 		SaveString(hkDefault, "group2", value);
 	}
+#else
+	SaveString(hkDefault, "group2", value);
+#endif
 }
 TCHAR*
 vncSetAuth::Readgroup2()
 {
+#if !_REMOTE_SUPPORT
 	if (m_fUseRegistry)
 		{
 		TCHAR *value=NULL;
@@ -246,11 +281,17 @@ vncSetAuth::Readgroup2()
 		value=LoadString (hkDefault, "group2");
 		return value;
 	}
+#else
+	TCHAR *value=NULL;
+	value=LoadString (hkDefault, "group2");
+	return value;
+#endif
 }
 
 void
 vncSetAuth::savegroup3(TCHAR *value)
 {
+#if !_REMOTE_SUPPORT
 	if (m_fUseRegistry)
 	{
 		OpenRegistry();
@@ -261,10 +302,14 @@ vncSetAuth::savegroup3(TCHAR *value)
 	{
 		SaveString(hkDefault, "group3", value);
 	}
+#else
+	SaveString(hkDefault, "group3", value);
+#endif
 }
 TCHAR*
 vncSetAuth::Readgroup3()
 {
+#if !_REMOTE_SUPPORT
 	if (m_fUseRegistry)
 	{
 		TCHAR *value=NULL;
@@ -279,11 +324,17 @@ vncSetAuth::Readgroup3()
 		value=LoadString (hkDefault, "group3");
 		return value;
 	}
+#else
+	TCHAR *value=NULL;
+	value=LoadString (hkDefault, "group3");
+	return value;
+#endif
 }
 
 LONG
 vncSetAuth::Readlocdom1(LONG returnvalue)
 {
+#if !_REMOTE_SUPPORT
 	if (m_fUseRegistry)
 	{
 		OpenRegistry();
@@ -296,11 +347,16 @@ vncSetAuth::Readlocdom1(LONG returnvalue)
 		returnvalue=LoadInt(hkDefault, "locdom1",returnvalue);
 		return returnvalue;
 	}
+#else
+	returnvalue=LoadInt(hkDefault, "locdom1",returnvalue);
+	return returnvalue;
+#endif
 }
 
 void
 vncSetAuth::savelocdom1(LONG value)
 {
+#if !_REMOTE_SUPPORT
 	if (m_fUseRegistry)
 	{
 		OpenRegistry();
@@ -311,12 +367,15 @@ vncSetAuth::savelocdom1(LONG value)
 	{
 		SaveInt(hkDefault, "locdom1", value);
 	}
-
+#else
+	SaveInt(hkDefault, "locdom1", value);
+#endif
 }
 
 LONG
 vncSetAuth::Readlocdom2(LONG returnvalue)
 {
+#if !_REMOTE_SUPPORT
 	if (m_fUseRegistry)
 	{
 		OpenRegistry();
@@ -329,11 +388,16 @@ vncSetAuth::Readlocdom2(LONG returnvalue)
 		returnvalue=LoadInt(hkDefault, "locdom2",returnvalue);
 		return returnvalue;
 	}
+#else
+	returnvalue=LoadInt(hkDefault, "locdom2",returnvalue);
+	return returnvalue;
+#endif
 }
 
 void
 vncSetAuth::savelocdom2(LONG value)
 {
+#if !_REMOTE_SUPPORT
 	if (m_fUseRegistry)
 	{
 		OpenRegistry();
@@ -344,12 +408,15 @@ vncSetAuth::savelocdom2(LONG value)
 	{
 		SaveInt(hkDefault, "locdom2", value);
 	}
-
+#else
+	SaveInt(hkDefault, "locdom2", value);
+#endif
 }
 
 LONG
 vncSetAuth::Readlocdom3(LONG returnvalue)
 {
+#if !_REMOTE_SUPPORT
 	if (m_fUseRegistry)
 	{
 		OpenRegistry();
@@ -362,11 +429,16 @@ vncSetAuth::Readlocdom3(LONG returnvalue)
 		returnvalue=LoadInt(hkDefault, "locdom3",returnvalue);
 		return returnvalue;
 	}
+#else
+	returnvalue=LoadInt(hkDefault, "locdom3",returnvalue);
+	return returnvalue;
+#endif
 }
 
 void
 vncSetAuth::savelocdom3(LONG value)
 {
+#if !_REMOTE_SUPPORT
 	if (m_fUseRegistry)
 	{
 		OpenRegistry();
@@ -377,7 +449,9 @@ vncSetAuth::savelocdom3(LONG value)
 	{
 		SaveInt(hkDefault, "locdom3", value);
 	}
-
+#else
+	SaveInt(hkDefault, "locdom3", value);
+#endif
 }
 
 ///////////////////////////////////////////////////////////
@@ -387,7 +461,9 @@ vncSetAuth::savelocdom3(LONG value)
 // Constructor/destructor
 vncSetAuth::vncSetAuth()
 {
+#if !_REMOTE_SUPPORT
 	m_fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
+#endif
 	m_dlgvisible = FALSE;
 	hkLocal=NULL;
 	hkDefault=NULL;

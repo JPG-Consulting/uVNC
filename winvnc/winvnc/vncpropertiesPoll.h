@@ -56,7 +56,10 @@ public:
 
 	void Save();
 
+#if !_REMOTE_SUPPORT
 	BOOL m_fUseRegistry;
+#endif
+
 	// Ini file
 	IniFile myIniFile;
 	void LoadFromIniFile();

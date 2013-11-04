@@ -58,6 +58,7 @@ HKEY hkLocal=NULL;
 HKEY hkDefault=NULL;
 HKEY hkUser=NULL;
 
+#if !_REMOTE_SUPPORT
 void
 OpenRegistry()
 {
@@ -93,11 +94,14 @@ CloseRegistry()
 		if (hkLocal != NULL) RegCloseKey(hkLocal);
 	}
 }
+#endif
 
 LONG
 LoadInt(HKEY key, LPCSTR valname, LONG defval)
 {
 	IniFile myIniFile;
+
+#if !_REMOTE_SUPPORT
 	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
 	if (fUseRegistry)
 	{
@@ -125,12 +129,16 @@ LoadInt(HKEY key, LPCSTR valname, LONG defval)
 	{
 		return myIniFile.ReadInt("admin_auth", (char *)valname, defval);
 	}
+#else
+	return myIniFile.ReadInt("admin_auth", (char *)valname, defval);
+#endif
 }
 
 TCHAR *
 LoadString(HKEY key, LPCSTR keyname)
 {
 	IniFile myIniFile;
+#if !_REMOTE_SUPPORT
 	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
 	if (fUseRegistry)
 	{
@@ -179,12 +187,18 @@ LoadString(HKEY key, LPCSTR keyname)
 		myIniFile.ReadString("admin_auth", (char *)keyname,authhosts,150);
 		return (TCHAR *)authhosts;
 	}
+#else
+	TCHAR *authhosts=new char[150];
+	myIniFile.ReadString("admin_auth", (char *)keyname,authhosts,150);
+	return (TCHAR *)authhosts;
+#endif
 }
 
 void
 SaveInt(HKEY key, LPCSTR valname, LONG val)
 {
 	IniFile myIniFile;
+#if !_REMOTE_SUPPORT
 	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
 	if (fUseRegistry)
 	{
@@ -194,12 +208,16 @@ SaveInt(HKEY key, LPCSTR valname, LONG val)
 	{
 		myIniFile.WriteInt("admin_auth", (char *)valname, val);
 	}
+#else
+	myIniFile.WriteInt("admin_auth", (char *)valname, val);
+#endif
 }
 
 void
 SaveString(HKEY key,LPCSTR valname, TCHAR *buffer)
 {
 	IniFile myIniFile;
+#if !_REMOTE_SUPPORT
 	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
 	if (fUseRegistry)
 	{
@@ -209,12 +227,16 @@ SaveString(HKEY key,LPCSTR valname, TCHAR *buffer)
 	{
 		myIniFile.WriteString("admin_auth", (char *)valname,buffer);
 	}
+#else
+	myIniFile.WriteString("admin_auth", (char *)valname,buffer);
+#endif
 }
 
 void
 savegroup1(TCHAR *value)
 {
 	IniFile myIniFile;
+#if !_REMOTE_SUPPORT
 	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
 	if (fUseRegistry)
 	{
@@ -226,11 +248,15 @@ savegroup1(TCHAR *value)
 	{
 		SaveString(hkDefault, "group1", value);
 	}
+#else
+	SaveString(hkDefault, "group1", value);
+#endif
 }
 TCHAR*
 Readgroup1()
 {
 	IniFile myIniFile;
+#if !_REMOTE_SUPPORT
 	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
 	if (fUseRegistry)
 	{
@@ -246,12 +272,18 @@ Readgroup1()
 		value=LoadString (hkDefault, "group1");
 		return value;
 	}
+#else
+	TCHAR *value=NULL;
+	value=LoadString (hkDefault, "group1");
+	return value;
+#endif
 }
 
 void
 savegroup2(TCHAR *value)
 {
 	IniFile myIniFile;
+#if !_REMOTE_SUPPORT
 	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
 	if (fUseRegistry)
 	{
@@ -263,11 +295,15 @@ savegroup2(TCHAR *value)
 	{
 		SaveString(hkDefault, "group2", value);
 	}
+#else
+	SaveString(hkDefault, "group2", value);
+#endif
 }
 TCHAR*
 Readgroup2()
 {
 	IniFile myIniFile;
+#if !_REMOTE_SUPPORT
 	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
 	if (fUseRegistry)
 	{
@@ -283,12 +319,18 @@ Readgroup2()
 		value=LoadString (hkDefault, "group2");
 		return value;
 	}
+#else
+	TCHAR *value=NULL;
+	value=LoadString (hkDefault, "group2");
+	return value;
+#endif
 }
 
 void
 savegroup3(TCHAR *value)
 {
 	IniFile myIniFile;
+#if !_REMOTE_SUPPORT
 	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
 	if (fUseRegistry)
 	{
@@ -300,11 +342,15 @@ savegroup3(TCHAR *value)
 	{
 		SaveString(hkDefault, "group3", value);
 	}
+#else
+	SaveString(hkDefault, "group3", value);
+#endif
 }
 TCHAR*
 Readgroup3()
 {
 	IniFile myIniFile;
+#if !_REMOTE_SUPPORT
 	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
 	if (fUseRegistry)
 	{
@@ -320,12 +366,18 @@ Readgroup3()
 		value=LoadString (hkDefault, "group3");
 		return value;
 	}
+#else
+	TCHAR *value=NULL;
+	value=LoadString (hkDefault, "group3");
+	return value;
+#endif
 }
 
 LONG
 Readlocdom1(LONG returnvalue)
 {
 	IniFile myIniFile;
+#if !_REMOTE_SUPPORT
 	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
 	if (fUseRegistry)
 	{
@@ -339,12 +391,17 @@ Readlocdom1(LONG returnvalue)
 		returnvalue=LoadInt(hkDefault, "locdom1",returnvalue);
 		return returnvalue;
 	}
+#else
+	returnvalue=LoadInt(hkDefault, "locdom1",returnvalue);
+	return returnvalue;
+#endif
 }
 
 void
 savelocdom1(LONG value)
 {
 	IniFile myIniFile;
+#if !_REMOTE_SUPPORT
 	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
 	if (fUseRegistry)
 	{
@@ -356,13 +413,16 @@ savelocdom1(LONG value)
 	{
 		SaveInt(hkDefault, "locdom1", value);
 	}
-
+#else
+	SaveInt(hkDefault, "locdom1", value);
+#endif
 }
 
 LONG
 Readlocdom2(LONG returnvalue)
 {
 	IniFile myIniFile;
+#if !_REMOTE_SUPPORT
 	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
 	if (fUseRegistry)
 	{
@@ -376,12 +436,17 @@ Readlocdom2(LONG returnvalue)
 		returnvalue=LoadInt(hkDefault, "locdom2",returnvalue);
 		return returnvalue;
 	}
+#else
+	returnvalue=LoadInt(hkDefault, "locdom2",returnvalue);
+	return returnvalue;
+#endif
 }
 
 void
 savelocdom2(LONG value)
 {
 	IniFile myIniFile;
+#if !_REMOTE_SUPPORT
 	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
 	if (fUseRegistry)
 	{
@@ -393,13 +458,16 @@ savelocdom2(LONG value)
 	{
 		SaveInt(hkDefault, "locdom2", value);
 	}
-
+#else
+	SaveInt(hkDefault, "locdom2", value);
+#endif
 }
 
 LONG
 Readlocdom3(LONG returnvalue)
 {
 	IniFile myIniFile;
+#if !_REMOTE_SUPPORT
 	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
 	if (fUseRegistry)
 	{
@@ -413,12 +481,17 @@ Readlocdom3(LONG returnvalue)
 		returnvalue=LoadInt(hkDefault, "locdom3",returnvalue);
 		return returnvalue;
 	}
+#else
+	returnvalue=LoadInt(hkDefault, "locdom3",returnvalue);
+	return returnvalue;
+#endif
 }
 
 void
 savelocdom3(LONG value)
 {
 	IniFile myIniFile;
+#if !_REMOTE_SUPPORT
 	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
 	if (fUseRegistry)
 	{
@@ -430,7 +503,9 @@ savelocdom3(LONG value)
 	{
 		SaveInt(hkDefault, "locdom3", value);
 	}
-
+#else
+	SaveInt(hkDefault, "locdom3", value);
+#endif
 }
 
 ///////////////////////////////////////////////////////////
@@ -1085,6 +1160,7 @@ BOOL IsNewMSLogon(){
 	ULONG type = REG_DWORD;
 	ULONG datasize = sizeof(data);
 	IniFile myIniFile;
+#if !_REMOTE_SUPPORT
 	BOOL fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
 		
 	if (fUseRegistry)
@@ -1118,5 +1194,9 @@ BOOL IsNewMSLogon(){
 		newmslogon=myIniFile.ReadInt("admin", "NewMSLogon", newmslogon);
 		return newmslogon;
 	}
-
+#else
+	BOOL newmslogon=false;
+	newmslogon=myIniFile.ReadInt("admin", "NewMSLogon", newmslogon);
+	return newmslogon;
+#endif
 }

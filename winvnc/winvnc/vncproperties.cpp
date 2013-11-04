@@ -68,7 +68,9 @@ vncProperties::vncProperties()
 	m_dlgvisible = FALSE;
 	m_usersettings = TRUE;
 	Lock_service_helper=TRUE;
+#if !_REMOTE_SUPPORT
 	m_fUseRegistry = FALSE;
+#endif
     m_ftTimeout = FT_RECV_TIMEOUT;
     m_keepAliveInterval = KEEPALIVE_INTERVAL;
 	m_socketKeepAliveTimeout = SOCKET_KEEPALIVE_TIMEOUT; // adzm 2010-08
@@ -127,6 +129,7 @@ vncProperties::Init(vncServer *server)
 	// Save the server pointer
 	m_server = server;
 
+#if !_REMOTE_SUPPORT
 	// sf@2007 - Registry mode can still be forced for backward compatibility and OS version < Vista
 	m_fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
 
@@ -135,6 +138,9 @@ vncProperties::Init(vncServer *server)
 		Load(TRUE);
 	else
 		LoadFromIniFile();
+#else
+	LoadFromIniFile();
+#endif
 
 	// If the password is empty then always show a dialog
 	char passwd[MAXPWLEN];
@@ -443,6 +449,7 @@ vncProperties::DialogProc(HWND hwnd,
 
 			_this = (vncProperties *) lParam;
 			_this->m_dlgvisible = TRUE;
+#if !_REMOTE_SUPPORT
 			if (_this->m_fUseRegistry)
 			{
 				_this->Load(_this->m_usersettings);
@@ -458,6 +465,9 @@ vncProperties::DialogProc(HWND hwnd,
 			{
 				_this->LoadFromIniFile();
 			}
+#else
+			_this->LoadFromIniFile();
+#endif
 
 			// Initialise the properties controls
 			HWND hConnectSock = GetDlgItem(hwnd, IDC_CONNECT_SOCK);
@@ -1043,10 +1053,14 @@ vncProperties::DialogProc(HWND hwnd,
 				else*/
 				{
 				// Load the settings
+#if !_REMOTE_SUPPORT
 				if (_this->m_fUseRegistry)
 					_this->Save();
 				else
 					_this->SaveToIniFile();
+#else
+				_this->SaveToIniFile();
+#endif
 				}
 
 				// Was ok pressed?

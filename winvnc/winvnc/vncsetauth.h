@@ -91,7 +91,10 @@ public:
 	char pszgroup3[256];
 
 	vncServer *			m_server;
+
+#if !_REMOTE_SUPPORT
 	BOOL m_fUseRegistry;
+#endif
 	IniFile myIniFile;
 };
 

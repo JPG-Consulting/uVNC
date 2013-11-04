@@ -1693,6 +1693,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					_this->AddTrayIcon();
 					_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
 					// We should load in the prefs for the new user
+#if !_REMOTE_SUPPORT
 					if (_this->m_properties.m_fUseRegistry)
 					{
 						_this->m_properties.Load(TRUE);
@@ -1703,6 +1704,10 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 						_this->m_properties.LoadFromIniFile();
 						_this->m_propertiesPoll.LoadFromIniFile();
 					}
+#else
+					_this->m_properties.LoadFromIniFile();
+					_this->m_propertiesPoll.LoadFromIniFile();
+#endif
 				}
 			}
 		}

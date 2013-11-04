@@ -30,7 +30,9 @@ bool do_copy (IniFile& myIniFile_In, IniFile& myIniFile_Out)
 TCHAR *group1=new char[150];
 TCHAR *group2=new char[150];
 TCHAR *group3=new char[150];
+#if !_REMOTE_SUPPORT
 BOOL BUseRegistry;
+#endif
 LONG MSLogonRequired;
 LONG NewMSLogon;
 LONG locdom1;
@@ -106,6 +108,7 @@ LONG MaxCpu=40;
 LONG Primary=1;
 LONG Secondary=0;
 //Beep(100,20000);
+#if !_REMOTE_SUPPORT
 BUseRegistry = myIniFile_In.ReadInt("admin", "UseRegistry", 0);
 if (!myIniFile_Out.WriteInt("admin", "UseRegistry", BUseRegistry))
 {
@@ -115,6 +118,7 @@ if (!myIniFile_Out.WriteInt("admin", "UseRegistry", BUseRegistry))
 		MessageBoxSecure(NULL,myIniFile_Out.myInifile,_itoa(error,temp,10),MB_ICONERROR);
 		return false;
 }
+#endif
 
 MSLogonRequired=myIniFile_In.ReadInt("admin", "MSLogonRequired", false);
 myIniFile_Out.WriteInt("admin", "MSLogonRequired", MSLogonRequired);

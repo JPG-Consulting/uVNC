@@ -68,7 +68,10 @@ public:
 	BOOL AllowEditClients() {return m_alloweditclients;};
 	bool Lock_service_helper;
 
+#if !_REMOTE_SUPPORT
 	BOOL m_fUseRegistry;
+#endif
+
 	// Ini file
 	IniFile myIniFile;
 	void LoadFromIniFile();

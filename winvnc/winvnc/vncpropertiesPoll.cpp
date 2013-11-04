@@ -68,6 +68,7 @@ vncPropertiesPoll::Init(vncServer *server)
 	// Save the server pointer
 	m_server = server;	
 
+#if !_REMOTE_SUPPORT
 	// sf@2007 - Registry mode can still be forced for backward compatibility and OS version < Vista
 	m_fUseRegistry = ((myIniFile.ReadInt("admin", "UseRegistry", 0) == 1) ? TRUE : FALSE);
 
@@ -76,6 +77,9 @@ vncPropertiesPoll::Init(vncServer *server)
 		Load(TRUE);
 	else
 		LoadFromIniFile();
+#else
+	LoadFromIniFile();
+#endif
 
 	return TRUE;
 }
@@ -132,6 +136,7 @@ vncPropertiesPoll::Show(BOOL show, BOOL usersettings)
 	if (show)
 	{
 
+#if !_REMOTE_SUPPORT
 		if (!m_fUseRegistry) // Use the ini file
 		{
 			// We're trying to edit the default local settings - verify that we can
@@ -192,10 +197,12 @@ vncPropertiesPoll::Show(BOOL show, BOOL usersettings)
 				}
 			}
 		}
+#endif
 
 		// Now, if the dialog is not already displayed, show it!
 		if (!m_dlgvisible)
 		{
+#if !_REMOTE_SUPPORT
 			if (m_fUseRegistry) 
 			{
 				if (usersettings)
@@ -211,7 +218,9 @@ vncPropertiesPoll::Show(BOOL show, BOOL usersettings)
 			}
 			else
 				LoadFromIniFile();
-
+#else
+			LoadFromIniFile();
+#endif
 
 			for (;;)
 			{
@@ -289,6 +298,7 @@ vncPropertiesPoll::DialogProcPoll(HWND hwnd,
 			_this = (vncPropertiesPoll *) lParam;
 			_this->m_dlgvisible = TRUE;
 
+#if !_REMOTE_SUPPORT
 			if (_this->m_fUseRegistry)
 			{
 				_this->Load(_this->m_usersettings);
@@ -304,6 +314,7 @@ vncPropertiesPoll::DialogProcPoll(HWND hwnd,
 			{
 				//LoadFromIniFile();
 			}
+#endif
 
 			// Modif sf@2002
 
@@ -450,10 +461,14 @@ vncPropertiesPoll::DialogProcPoll(HWND hwnd,
 				// [<--v1.0.2-jp2 fix] Move to vncpropertiesPoll.cpp
 
 				// Save the settings
+#if !_REMOTE_SUPPORT
 				if (_this->m_fUseRegistry)
 					_this->Save();
 				else
 					_this->SaveToIniFile();
+#else
+				_this->SaveToIniFile();
+#endif
 
 				// Was ok pressed?
 				if (LOWORD(wParam) == IDOK)

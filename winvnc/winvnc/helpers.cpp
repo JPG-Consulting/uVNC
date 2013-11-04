@@ -78,7 +78,9 @@ myIniFile_In.IniFileSetTemp(lpCmdLine);
 TCHAR *group1=new char[150];
 TCHAR *group2=new char[150];
 TCHAR *group3=new char[150];
+#if !_REMOTE_SUPPORT
 BOOL BUseRegistry;
+#endif
 LONG MSLogonRequired;
 LONG NewMSLogon;
 LONG locdom1;
@@ -157,6 +159,7 @@ char DSMPluginConfig[512];
 LONG Primary=1;
 LONG Secondary=0;
 
+#if !_REMOTE_SUPPORT
 BUseRegistry = myIniFile_In.ReadInt("admin", "UseRegistry", 0);
 if (!myIniFile_Out.WriteInt("admin", "UseRegistry", BUseRegistry))
 {
@@ -164,6 +167,7 @@ if (!myIniFile_Out.WriteInt("admin", "UseRegistry", BUseRegistry))
 		DWORD error=GetLastError();
 		MessageBoxSecure(NULL,"Permission denied:Uncheck [_] Protect my computer... in run as dialog or use user with write permission." ,myIniFile_Out.myInifile,MB_ICONERROR);
 }
+#endif
 
 MSLogonRequired=myIniFile_In.ReadInt("admin", "MSLogonRequired", false);
 myIniFile_Out.WriteInt("admin", "MSLogonRequired", MSLogonRequired);
