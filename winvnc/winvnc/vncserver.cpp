@@ -128,15 +128,19 @@ vncServer::vncServer()
 
 	// Initialise some important stuffs...
 	g_Server_running=true;
+#if !_REMOTE_SUPPORT
 	m_socketConn = NULL;
 	m_httpConn = NULL;
 	m_enableHttpConn = false;
 	m_enableXdmcpConn = false;
+#endif
 	m_desktop = NULL;
 	m_name = NULL;
 	m_port = DISPLAY_TO_PORT(0);
 	m_port_http = DISPLAY_TO_HPORT(0); // TightVNC 1.2.7
+#if !_REMOTE_SUPPORT
 	m_autoportselect = TRUE;
+#endif
 	m_passwd_required = TRUE;
 	m_auth_hosts = 0;
 	m_blacklist = 0;
@@ -227,7 +231,9 @@ vncServer::vncServer()
 
 	m_impersonationtoken=NULL; //byteboon
 
+#if !_REMOTE_SUPPORT
 	m_xdmcpConn=NULL;
+#endif
 
 	m_impersonationtoken=NULL; // Modif Jeremy C. 
 
@@ -262,6 +268,7 @@ vncServer::~vncServer()
 		m_retry_timeout = 0;
 	}
 
+#if !_REMOTE_SUPPORT
 	// If there is a socket_conn object then delete it
 	if (m_socketConn != NULL)
 	{
@@ -274,6 +281,7 @@ vncServer::~vncServer()
 		delete m_httpConn;
 		m_httpConn = NULL;
 	}
+#endif
 
 	// Modif Jeremy C. 
 	if(m_impersonationtoken) 
@@ -361,6 +369,7 @@ vncServer::ShutdownServer()
 		m_retry_timeout = 0;
 	}
 
+#if !_REMOTE_SUPPORT
 	// If there is a socket_conn object then delete it
 	if (m_socketConn != NULL)
 	{
@@ -373,6 +382,7 @@ vncServer::ShutdownServer()
 		delete m_httpConn;
 		m_httpConn = NULL;
 	}
+#endif
 
 	// Modif Jeremy C. 
 	if(m_impersonationtoken) 
@@ -1442,6 +1452,7 @@ vncServer::SetName(const char * name)
 	m_name = _strdup(name);
 }
 
+#if !_REMOTE_SUPPORT
 // TightVNC 1.2.7
 void
 vncServer::SetPorts(const UINT port_rfb, const UINT port_http)
@@ -1458,6 +1469,7 @@ vncServer::SetPorts(const UINT port_rfb, const UINT port_http)
 			SockConnect(TRUE);
     }
 }
+#endif
 
 // RealVNC method
 /*
@@ -1573,6 +1585,7 @@ vncServer::Clearconsole(BOOL enable)
 }
 
 
+#if !_REMOTE_SUPPORT
 
 void 
 vncServer::KillSockConnect()
@@ -1795,6 +1808,7 @@ vncServer::LoopbackOnly()
 {
 	return m_loopbackOnly;
 }
+#endif
 
 void
 vncServer::GetScreenInfo(int &width, int &height, int &depth)

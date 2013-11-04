@@ -473,18 +473,29 @@ vncProperties::DialogProc(HWND hwnd,
 			HWND hConnectSock = GetDlgItem(hwnd, IDC_CONNECT_SOCK);
 
 			// Tight 1.2.7 method
+#if !_REMOTE_SUPPORT
 			BOOL bConnectSock = _this->m_server->SockConnected();
 			SendMessage(hConnectSock, BM_SETCHECK, bConnectSock, 0);
+#endif
 
 			// Set the content of the password field to a predefined string.
 		    SetDlgItemText(hwnd, IDC_PASSWORD, "~~~~~~~~");
+#if !_REMOTE_SUPPORT
 			EnableWindow(GetDlgItem(hwnd, IDC_PASSWORD), bConnectSock);
+#else
+			EnableWindow(GetDlgItem(hwnd, IDC_PASSWORD), false);
+#endif
 
 			// Set the content of the view-only password field to a predefined string. //PGM
 		    SetDlgItemText(hwnd, IDC_PASSWORD2, "~~~~~~~~"); //PGM
+#if !_REMOTE_SUPPORT
 			EnableWindow(GetDlgItem(hwnd, IDC_PASSWORD2), bConnectSock); //PGM
+#else
+			EnableWindow(GetDlgItem(hwnd, IDC_PASSWORD2), false); //PGM
+#endif
 
 			// Set the initial keyboard focus
+#if !_REMOTE_SUPPORT
 			if (bConnectSock)
 			{
 				SetFocus(GetDlgItem(hwnd, IDC_PASSWORD));
@@ -492,6 +503,7 @@ vncProperties::DialogProc(HWND hwnd,
 			}
 			else
 				SetFocus(hConnectSock);
+
 			// Set display/ports settings
 			_this->InitPortSettings(hwnd);
 
@@ -505,7 +517,9 @@ vncProperties::DialogProc(HWND hwnd,
 //				BM_SETCHECK,
 //				_this->m_server->XDMCPConnectEnabled(),
 //				0);
-
+#else
+			SetFocus(hConnectSock);
+#endif
 			// Modif sf@2002
 //		   HWND hSingleWindow = GetDlgItem(hwnd, IDC_SINGLE_WINDOW);
 //           SendMessage(hSingleWindow, BM_SETCHECK, _this->m_server->SingleWindow(), 0);
@@ -544,9 +558,11 @@ vncProperties::DialogProc(HWND hwnd,
 		   BOOL fLoopback = _this->m_server->LoopbackOk();
 		   SendMessage(hLoopback, BM_SETCHECK, fLoopback, 0);
 
+#if !_REMOTE_SUPPORT
 		   HWND hLoopbackonly = GetDlgItem(hwnd, IDC_LOOPBACKONLY);
 		   BOOL fLoopbackonly = _this->m_server->LoopbackOnly();
 		   SendMessage(hLoopbackonly, BM_SETCHECK, fLoopbackonly, 0);
+#endif
 
 		   HWND hTrayicon = GetDlgItem(hwnd, IDC_DISABLETRAY);
 		   BOOL fTrayicon = _this->m_server->GetDisableTrayIcon();
@@ -829,6 +845,7 @@ vncProperties::DialogProc(HWND hwnd,
 				} //PGM
 
 				// Save the new settings to the server
+#if !_REMOTE_SUPPORT
 				int state = SendDlgItemMessage(hwnd, IDC_PORTNO_AUTO, BM_GETCHECK, 0, 0);
 				_this->m_server->SetAutoPortSelect(state == BST_CHECKED);
 
@@ -871,7 +888,8 @@ vncProperties::DialogProc(HWND hwnd,
 				_this->m_server->EnableXDMCPConnect(
 					SendMessage(hConnectXDMCP, BM_GETCHECK, 0, 0) == BST_CHECKED
 					);
-				
+#endif
+
 				// Remote input stuff
 				HWND hEnableRemoteInputs = GetDlgItem(hwnd, IDC_DISABLE_INPUTS);
 				_this->m_server->EnableRemoteInputs(
@@ -975,7 +993,9 @@ vncProperties::DialogProc(HWND hwnd,
 //				_this->m_server->GammaGray(SendMessage(hGammaGray, BM_GETCHECK, 0, 0) == BST_CHECKED);
 
 				_this->m_server->SetLoopbackOk(IsDlgButtonChecked(hwnd, IDC_ALLOWLOOPBACK));
+#if !_REMOTE_SUPPORT
 				_this->m_server->SetLoopbackOnly(IsDlgButtonChecked(hwnd, IDC_LOOPBACKONLY));
+#endif
 
 				_this->m_server->SetDisableTrayIcon(IsDlgButtonChecked(hwnd, IDC_DISABLETRAY));
 				_this->m_allowshutdown=!IsDlgButtonChecked(hwnd, IDC_ALLOWSHUTDOWN);
@@ -1201,6 +1221,7 @@ vncProperties::DialogProc(HWND hwnd,
 			}
 			return TRUE;
 
+#if !_REMOTE_SUPPORT
 		case IDC_SPECDISPLAY:
 			{
 				EnableWindow(GetDlgItem(hwnd, IDC_DISPLAYNO), TRUE);
@@ -1240,6 +1261,7 @@ vncProperties::DialogProc(HWND hwnd,
 			}
 			return TRUE;
 
+#endif
 		// RealVNC method
 		/*
 		case IDC_AUTO_DISPLAY_NO:
@@ -1430,6 +1452,7 @@ vncProperties::DialogProc(HWND hwnd,
 
 
 
+#if !_REMOTE_SUPPORT
 // TightVNC 1.2.7
 // Set display/port settings to the correct state
 void
@@ -1469,7 +1492,7 @@ vncProperties::InitPortSettings(HWND hwnd)
 	EnableWindow(GetDlgItem(hwnd, IDC_PORTHTTP),
 		bConnectSock && !bAutoPort && !bValidDisplay);
 }
-
+#endif
 
 // Functions to load & save the settings
 LONG
@@ -1748,8 +1771,9 @@ vncProperties::Load(BOOL usersettings)
 	m_server->SetDisableTrayIcon(LoadInt(hkLocal, "DisableTrayIcon", false));
 
 	// Authentication required, loopback allowed, loopbackOnly
-
+#if !_REMOTE_SUPPORT
 	m_server->SetLoopbackOnly(LoadInt(hkLocal, "LoopbackOnly", false));
+#endif
 
 	m_pref_RequireMSLogon=false;
 	m_pref_RequireMSLogon = LoadInt(hkLocal, "MSLogonRequired", m_pref_RequireMSLogon);
@@ -1776,11 +1800,16 @@ vncProperties::Load(BOOL usersettings)
 		}
 	}
 
+#if !_REMOTE_SUPPORT
 	if (m_server->LoopbackOnly()) m_server->SetLoopbackOk(true);
 	else m_server->SetLoopbackOk(LoadInt(hkLocal, "AllowLoopback", true));
+#else
+	m_server->SetLoopbackOk(LoadInt(hkLocal, "AllowLoopback", true));
+#endif
 	m_server->SetAuthRequired(LoadInt(hkLocal, "AuthRequired", true));
 
 	m_server->SetConnectPriority(LoadInt(hkLocal, "ConnectPriority", 0));
+#if !_REMOTE_SUPPORT
 	if (!m_server->LoopbackOnly())
 	{
 		char *authhosts = LoadString(hkLocal, "AuthHosts");
@@ -1793,6 +1822,7 @@ vncProperties::Load(BOOL usersettings)
 	} else {
 		m_server->SetAuthHosts(0);
 	}
+#endif
 
 	// If Socket connections are allowed, should the HTTP server be enabled?
 LABELUSERSETTINGS:
@@ -1801,11 +1831,13 @@ LABELUSERSETTINGS:
 
 	// Set the default user prefs
 	vnclog.Print(LL_INTINFO, VNCLOG("clearing user settings\n"));
+#if !_REMOTE_SUPPORT
 	m_pref_AutoPortSelect=TRUE;
     m_pref_HTTPConnect = TRUE;
 	m_pref_XDMCPConnect = TRUE;
 	m_pref_PortNumber = RFB_PORT_OFFSET; 
 	m_pref_SockConnect=TRUE;
+#endif
 	{
 	    vncPasswd::FromClear crypt;
 	    memcpy(m_pref_passwd, crypt, MAXPWLEN);
@@ -1937,6 +1969,7 @@ vncProperties::LoadUserPrefs(HKEY appkey)
 	LoadDSMPluginName(appkey, m_pref_szDSMPlugin);
 
 	// Connection prefs
+#if !_REMOTE_SUPPORT
 	m_pref_SockConnect=LoadInt(appkey, "SocketConnect", m_pref_SockConnect);
 	m_pref_HTTPConnect=LoadInt(appkey, "HTTPConnect", m_pref_HTTPConnect);
 	m_pref_XDMCPConnect=LoadInt(appkey, "XDMCPConnect", m_pref_XDMCPConnect);
@@ -1944,6 +1977,7 @@ vncProperties::LoadUserPrefs(HKEY appkey)
 	m_pref_PortNumber=LoadInt(appkey, "PortNumber", m_pref_PortNumber);
 	m_pref_HttpPortNumber=LoadInt(appkey, "HTTPPortNumber",
 									DISPLAY_TO_HPORT(PORT_TO_DISPLAY(m_pref_PortNumber)));
+#endif
 	m_pref_IdleTimeout=LoadInt(appkey, "IdleTimeout", m_pref_IdleTimeout);
 	
 	m_pref_RemoveWallpaper=LoadInt(appkey, "RemoveWallpaper", m_pref_RemoveWallpaper);
@@ -2005,12 +2039,13 @@ vncProperties::ApplyUserPrefs()
 	m_server->EnableRemoveAero(m_pref_RemoveAero);
 
 	// Is the listening socket closing?
-
+#if !_REMOTE_SUPPORT
 	if (!m_pref_SockConnect)
 		m_server->SockConnect(m_pref_SockConnect);
 
 	m_server->EnableHTTPConnect(m_pref_HTTPConnect);
 	m_server->EnableXDMCPConnect(m_pref_XDMCPConnect);
+#endif
 
 	// Are inputs being disabled?
 	if (!m_pref_EnableRemoteInputs)
@@ -2025,6 +2060,7 @@ vncProperties::ApplyUserPrefs()
 	m_server->SetPassword(m_pref_passwd);
 	m_server->SetPassword2(m_pref_passwd2); //PGM
 
+#if !_REMOTE_SUPPORT
 	// Now change the listening port settings
 	m_server->SetAutoPortSelect(m_pref_AutoPortSelect);
 	if (!m_pref_AutoPortSelect)
@@ -2032,7 +2068,7 @@ vncProperties::ApplyUserPrefs()
 		m_server->SetPorts(m_pref_PortNumber, m_pref_HttpPortNumber); // Tight 1.2.7
 
 	m_server->SockConnect(m_pref_SockConnect);
-
+#endif
 
 	// Remote access prefs
 	m_server->EnableRemoteInputs(m_pref_EnableRemoteInputs);
@@ -2188,7 +2224,9 @@ vncProperties::Save()
 	SaveString(hkLocal, "path", vnclog.GetPath());
 	SaveInt(hkLocal, "DebugLevel", vnclog.GetLevel());
 	SaveInt(hkLocal, "AllowLoopback", m_server->LoopbackOk());
+#if !_REMOTE_SUPPORT
 	SaveInt(hkLocal, "LoopbackOnly", m_server->LoopbackOnly());
+#endif
 	if (hkDefault) SaveInt(hkDefault, "AllowShutdown", m_allowshutdown);
 	if (hkDefault) SaveInt(hkDefault, "AllowProperties",  m_allowproperties);
 	if (hkDefault) SaveInt(hkDefault, "AllowEditClients", m_alloweditclients);
@@ -2233,6 +2271,7 @@ vncProperties::SaveUserPrefs(HKEY appkey)
 	SaveString(appkey, "DSMPluginConfig", m_server->GetDSMPluginConfig());
 
 	// Connection prefs
+#if !_REMOTE_SUPPORT
 	SaveInt(appkey, "SocketConnect", m_server->SockConnected());
 	SaveInt(appkey, "HTTPConnect", m_server->HTTPConnectEnabled());
 	SaveInt(appkey, "XDMCPConnect", m_server->XDMCPConnectEnabled());
@@ -2241,6 +2280,7 @@ vncProperties::SaveUserPrefs(HKEY appkey)
 		SaveInt(appkey, "PortNumber", m_server->GetPort());
 		SaveInt(appkey, "HTTPPortNumber", m_server->GetHttpPort());
 	}
+#endif
 	SaveInt(appkey, "InputsEnabled", m_server->RemoteInputsEnabled());
 	SaveInt(appkey, "LocalInputsDisabled", m_server->LocalInputsDisabled());
 	SaveInt(appkey, "IdleTimeout", m_server->AutoIdleDisconnectTimeout());
@@ -2315,8 +2355,9 @@ void vncProperties::LoadFromIniFile()
 	m_server->SetDisableTrayIcon(myIniFile.ReadInt("admin", "DisableTrayIcon", false));
 
 	// Authentication required, loopback allowed, loopbackOnly
-
+#if !_REMOTE_SUPPORT
 	m_server->SetLoopbackOnly(myIniFile.ReadInt("admin", "LoopbackOnly", false));
+#endif
 
 	m_pref_RequireMSLogon=false;
 	m_pref_RequireMSLogon = myIniFile.ReadInt("admin", "MSLogonRequired", m_pref_RequireMSLogon);
@@ -2335,11 +2376,17 @@ void vncProperties::LoadFromIniFile()
 	//adzm 2010-05-12 - dsmplugin config
 	myIniFile.ReadString("admin", "DSMPluginConfig", m_pref_DSMPluginConfig, 512);
 
+#if !_REMOTE_SUPPORT
 	if (m_server->LoopbackOnly()) m_server->SetLoopbackOk(true);
 	else m_server->SetLoopbackOk(myIniFile.ReadInt("admin", "AllowLoopback", true));
+#else
+	m_server->SetLoopbackOk(myIniFile.ReadInt("admin", "AllowLoopback", true));
+#endif
+
 	m_server->SetAuthRequired(myIniFile.ReadInt("admin", "AuthRequired", true));
 
 	m_server->SetConnectPriority(myIniFile.ReadInt("admin", "ConnectPriority", 0));
+#if !_REMOTE_SUPPORT
 	if (!m_server->LoopbackOnly())
 	{
 		char *authhosts=new char[150];
@@ -2353,16 +2400,19 @@ void vncProperties::LoadFromIniFile()
 	} else {
 		m_server->SetAuthHosts(0);
 	}
+#endif
 
 	vnclog.Print(LL_INTINFO, VNCLOG("***** DBG - Load User Preferences\n"));
 
 	// Set the default user prefs
 	vnclog.Print(LL_INTINFO, VNCLOG("clearing user settings\n"));
+#if !_REMOTE_SUPPORT
 	m_pref_AutoPortSelect=TRUE;
     m_pref_HTTPConnect = TRUE;
 	m_pref_XDMCPConnect = TRUE;
 	m_pref_PortNumber = RFB_PORT_OFFSET; 
 	m_pref_SockConnect=TRUE;
+#endif
 	{
 	    vncPasswd::FromClear crypt;
 	    memcpy(m_pref_passwd, crypt, MAXPWLEN);
@@ -2448,6 +2498,7 @@ void vncProperties::LoadUserPrefsFromIniFile()
 	m_pref_Secondary = myIniFile.ReadInt("admin", "secondary", m_pref_Secondary);
 
 	// Connection prefs
+#if !_REMOTE_SUPPORT
 	m_pref_SockConnect=myIniFile.ReadInt("admin", "SocketConnect", m_pref_SockConnect);
 	m_pref_HTTPConnect=myIniFile.ReadInt("admin", "HTTPConnect", m_pref_HTTPConnect);
 	m_pref_XDMCPConnect=myIniFile.ReadInt("admin", "XDMCPConnect", m_pref_XDMCPConnect);
@@ -2455,6 +2506,7 @@ void vncProperties::LoadUserPrefsFromIniFile()
 	m_pref_PortNumber=myIniFile.ReadInt("admin", "PortNumber", m_pref_PortNumber);
 	m_pref_HttpPortNumber=myIniFile.ReadInt("admin", "HTTPPortNumber",
 									DISPLAY_TO_HPORT(PORT_TO_DISPLAY(m_pref_PortNumber)));
+#endif
 	m_pref_IdleTimeout=myIniFile.ReadInt("admin", "IdleTimeout", m_pref_IdleTimeout);
 	
 	m_pref_RemoveWallpaper=myIniFile.ReadInt("admin", "RemoveWallpaper", m_pref_RemoveWallpaper);
@@ -2520,7 +2572,9 @@ void vncProperties::SaveToIniFile()
 				myIniFile.WriteString("admin", "path", vnclog.GetPath());
 				myIniFile.WriteInt("admin", "DebugLevel", vnclog.GetLevel());
 				myIniFile.WriteInt("admin", "AllowLoopback", m_server->LoopbackOk());
+#if !_REMOTE_SUPPORT
 				myIniFile.WriteInt("admin", "LoopbackOnly", m_server->LoopbackOnly());
+#endif
 				myIniFile.WriteInt("admin", "AllowShutdown", m_allowshutdown);
 				myIniFile.WriteInt("admin", "AllowProperties",  m_allowproperties);
 				myIniFile.WriteInt("admin", "AllowEditClients", m_alloweditclients);
@@ -2545,7 +2599,9 @@ void vncProperties::SaveToIniFile()
 	myIniFile.WriteString("admin", "path", vnclog.GetPath());
 	myIniFile.WriteInt("admin", "DebugLevel", vnclog.GetLevel());
 	myIniFile.WriteInt("admin", "AllowLoopback", m_server->LoopbackOk());
+#if !_REMOTE_SUPPORT
 	myIniFile.WriteInt("admin", "LoopbackOnly", m_server->LoopbackOnly());
+#endif
 	myIniFile.WriteInt("admin", "AllowShutdown", m_allowshutdown);
 	myIniFile.WriteInt("admin", "AllowProperties",  m_allowproperties);
 	myIniFile.WriteInt("admin", "AllowEditClients", m_alloweditclients);
@@ -2588,6 +2644,7 @@ void vncProperties::SaveUserPrefsToIniFile()
 	myIniFile.WriteInt("admin", "secondary", m_server->Secondary());
 
 	// Connection prefs
+#if !_REMOTE_SUPPORT
 	myIniFile.WriteInt("admin", "SocketConnect", m_server->SockConnected());
 	myIniFile.WriteInt("admin", "HTTPConnect", m_server->HTTPConnectEnabled());
 	myIniFile.WriteInt("admin", "XDMCPConnect", m_server->XDMCPConnectEnabled());
@@ -2596,6 +2653,7 @@ void vncProperties::SaveUserPrefsToIniFile()
 		myIniFile.WriteInt("admin", "PortNumber", m_server->GetPort());
 		myIniFile.WriteInt("admin", "HTTPPortNumber", m_server->GetHttpPort());
 	}
+#endif
 	myIniFile.WriteInt("admin", "InputsEnabled", m_server->RemoteInputsEnabled());
 	myIniFile.WriteInt("admin", "LocalInputsDisabled", m_server->LocalInputsDisabled());
 	myIniFile.WriteInt("admin", "IdleTimeout", m_server->AutoIdleDisconnectTimeout());

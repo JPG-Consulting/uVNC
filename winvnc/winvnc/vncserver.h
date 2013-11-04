@@ -212,9 +212,11 @@ public:
 	// Name and port number handling
 	// TightVNC 1.2.7
 	virtual void SetName(const char * name);
+#if !_REMOTE_SUPPORT
 	virtual void SetPorts(const UINT port_rfb, const UINT port_http);
 	virtual UINT GetPort() { return m_port; };
 	virtual UINT GetHttpPort() { return m_port_http; };
+
 	// RealVNC method
 	/*
 	virtual void SetPort(const UINT port);
@@ -235,6 +237,7 @@ public:
 		}
 	};
 	virtual BOOL AutoPortSelect() {return m_autoportselect;};
+#endif
 
 	// Password set/retrieve.  Note that these functions now handle the encrypted
 	// form, not the plaintext form.  The buffer passwed MUST be MAXPWLEN in size.
@@ -259,11 +262,12 @@ public:
 	virtual UINT ConnectPriority() {return m_connect_pri;};
 
 	// Socket connection handling
+#if !_REMOTE_SUPPORT
 	virtual BOOL SockConnect(BOOL on);
 	virtual BOOL SockConnected();
 	virtual BOOL SetLoopbackOnly(BOOL loopbackOnly);
 	virtual BOOL LoopbackOnly();
-
+#endif
 
 	// Tray icon disposition
 	virtual BOOL SetDisableTrayIcon(BOOL disableTrayIcon);
@@ -273,10 +277,12 @@ public:
 
 
 	// HTTP daemon handling
+#if !_REMOTE_SUPPORT
 	virtual BOOL EnableHTTPConnect(BOOL enable);
 	virtual BOOL HTTPConnectEnabled() {return m_enableHttpConn;};
 	virtual BOOL EnableXDMCPConnect(BOOL enable);
 	virtual BOOL XDMCPConnectEnabled() {return m_enableXdmcpConn;};
+#endif
 
 	virtual void GetScreenInfo(int &width, int &height, int &depth);
 
@@ -482,9 +488,11 @@ protected:
 	// Connection servers
 	vncSockConnect		*m_socketConn;
 	vncHTTPConnect		*m_httpConn;
+#if !_REMOTE_SUPPORT
 	HANDLE				m_xdmcpConn;
 	BOOL				m_enableHttpConn;
 	BOOL				m_enableXdmcpConn;
+#endif
 
 	// The desktop handler
 	vncDesktop			*m_desktop;
@@ -492,7 +500,9 @@ protected:
 	// General preferences
 //	UINT				m_port;
 //	UINT				m_port_http; // TightVNC 1.2.7
+#if !_REMOTE_SUPPORT
 	BOOL				m_autoportselect;
+#endif
 	char				m_password[MAXPWLEN];
 	char				m_password2[MAXPWLEN]; //PGM
 	BOOL				m_passwd_required;

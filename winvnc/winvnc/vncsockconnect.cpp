@@ -209,8 +209,13 @@ BOOL vncSockConnect::Init(vncServer *server, UINT port)
 		return FALSE;
 
 	// Bind it
+#if !_REMOTE_SUPPORT
 	if (!m_socket.Bind(m_port, server->LoopbackOnly()))
 		return FALSE;
+#else
+	if (!m_socket.Bind(m_port, false))
+		return FALSE;
+#endif
 
 	// Set it to listen
 	if (!m_socket.Listen())

@@ -123,12 +123,14 @@ protected:
 	BOOL m_dlgvisible;
 
 	// STORAGE FOR THE PROPERTIES PRIOR TO APPLICATION
+#if !_REMOTE_SUPPORT
 	BOOL m_pref_SockConnect;
 	BOOL m_pref_HTTPConnect;
 	BOOL m_pref_XDMCPConnect;
 	BOOL m_pref_AutoPortSelect;
 	LONG m_pref_PortNumber;
 	LONG m_pref_HttpPortNumber;  // TightVNC 1.1.8
+#endif
 	char m_pref_passwd[MAXPWLEN];
 	char m_pref_passwd2[MAXPWLEN]; //PGM
 	UINT m_pref_QuerySetting;
@@ -180,7 +182,9 @@ protected:
 	BOOL m_pref_Secondary;
 
 private:
+#if !_REMOTE_SUPPORT
 	void InitPortSettings(HWND hwnd); // TightVNC 1.1.8
+#endif
 
 
 };

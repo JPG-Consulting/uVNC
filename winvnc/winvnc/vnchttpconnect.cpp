@@ -352,6 +352,7 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 			return;
 
 		// Compose the index page
+#if !_REMOTE_SUPPORT
 		if (m_server->SockConnected())
 		{
 			int width, height, depth;
@@ -387,6 +388,10 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 			// Send a "sorry, not allowed" page
 			sprintf(indexpage, HTTP_MSG_NOSOCKCONN);
 		}
+#else
+		// Send a "sorry, not allowed" page
+		sprintf(indexpage, HTTP_MSG_NOSOCKCONN);
+#endif
 
 		// Send the page
 		if (socket->SendExactHTTP(indexpage, strlen(indexpage)))
@@ -598,8 +603,13 @@ BOOL vncHTTPConnect::Init(vncServer *server, UINT port)
 		return FALSE;
 
 	// Bind it
+#if !_REMOTE_SUPPORT
 	if (!m_socket.Bind(m_port, server->LoopbackOnly()))
 		return FALSE;
+#else
+	if (!m_socket.Bind(m_port, false))
+		return FALSE;
+#endif
 
 	// Set it to listen
 	if (!m_socket.Listen())

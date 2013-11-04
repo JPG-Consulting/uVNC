@@ -63,12 +63,14 @@ LONG DefaultScale=1;
 LONG CaptureAlphaBlending=1;
 LONG BlackAlphaBlending=1;
 
+#if !_REMOTE_SUPPORT
 LONG SocketConnect=1;
 LONG HTTPConnect;
 LONG XDMCPConnect;
 LONG AutoPortSelect=1;
 LONG PortNumber=5900;
 LONG HttpPortNumber=5800;
+#endif
 LONG IdleTimeout=0;
 
 LONG RemoveWallpaper=0;
@@ -203,19 +205,23 @@ myIniFile_Out.WriteInt("admin", "primary", Primary);
 myIniFile_Out.WriteInt("admin", "secondary", Secondary);
 
 	// Connection prefs
+#if !_REMOTE_SUPPORT
 SocketConnect=myIniFile_In.ReadInt("admin", "SocketConnect", true);
 HTTPConnect=myIniFile_In.ReadInt("admin", "HTTPConnect", true);
 XDMCPConnect=myIniFile_In.ReadInt("admin", "XDMCPConnect", true);
 AutoPortSelect=myIniFile_In.ReadInt("admin", "AutoPortSelect", true);
 PortNumber=myIniFile_In.ReadInt("admin", "PortNumber", PortNumber);
 HttpPortNumber=myIniFile_In.ReadInt("admin", "HTTPPortNumber",HttpPortNumber);
+#endif
 IdleTimeout=myIniFile_In.ReadInt("admin", "IdleTimeout", IdleTimeout);
+#if !_REMOTE_SUPPORT
 myIniFile_Out.WriteInt("admin", "SocketConnect", SocketConnect);
 myIniFile_Out.WriteInt("admin", "HTTPConnect", HTTPConnect);
 myIniFile_Out.WriteInt("admin", "XDMCPConnect", XDMCPConnect);
 myIniFile_Out.WriteInt("admin", "AutoPortSelect", AutoPortSelect);
 myIniFile_Out.WriteInt("admin", "PortNumber", PortNumber);
 myIniFile_Out.WriteInt("admin", "HTTPPortNumber", HttpPortNumber);
+#endif
 myIniFile_Out.WriteInt("admin", "IdleTimeout", IdleTimeout);
 
 RemoveWallpaper=myIniFile_In.ReadInt("admin", "RemoveWallpaper", RemoveWallpaper);

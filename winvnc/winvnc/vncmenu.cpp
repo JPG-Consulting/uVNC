@@ -636,12 +636,14 @@ vncMenu::GetIPAddrString(char *buffer, int buflen) {
 			if (strcmp(buffer,old_buffer)!=NULL) //ip changed
 			{
 				vnclog.Print(LL_INTERR, VNCLOG("IP interface change detected %s %s\n"),buffer,old_buffer);
+#if !_REMOTE_SUPPORT
 				if (m_server->SockConnected())
 				{
 					// if connected restart
 					m_server->SockConnect(false);
 					m_server->SockConnect(true);
 				}
+#endif
 			}
 		}
 	old_buflen=strlen(buffer);
@@ -717,6 +719,7 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 	{
 	    strncat(m_nid.szTip, " - ", (sizeof(m_nid.szTip)-1)-strlen(m_nid.szTip));
 
+#if !_REMOTE_SUPPORT
 	    if (m_server->SockConnected())
 	    {
 		unsigned long tiplen = strlen(m_nid.szTip);
@@ -728,6 +731,9 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 	    {
 		strncat(m_nid.szTip, "Not listening", (sizeof(m_nid.szTip)-1)-strlen(m_nid.szTip));
 	    }
+#else
+		strncat(m_nid.szTip, "Not listening", (sizeof(m_nid.szTip)-1)-strlen(m_nid.szTip));
+#endif
 	}
 
 	char namebuf[256];
