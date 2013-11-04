@@ -90,6 +90,7 @@ char pszId_char[20];
 VCard32 address_vcard;
 int port_int;
 
+#if !_REMOTE_SUPPORT
 int start_service(char *cmd);
 int install_service(void);
 int uninstall_service(void);
@@ -99,12 +100,18 @@ void Real_stop_service();
 void Set_stop_service_as_admin();
 void Real_start_service();
 void Set_start_service_as_admin();
+#endif
+
 void Real_settings(char *mycommand);
 void Set_settings_as_admin(char *mycommand);
+#if !_REMOTE_SUPPORT
 void Set_uninstall_service_as_admin();
 void Set_install_service_as_admin();
+#endif
 void winvncSecurityEditorHelper_as_admin();
+#if !_REMOTE_SUPPORT
 bool GetServiceName(TCHAR *pszAppPath, TCHAR *pszServiceName);
+#endif
 void Open_homepage();
 void Open_forum();
 
@@ -115,6 +122,7 @@ BOOL SPECIAL_SC_PROMPT=false;
 BOOL G_HTTP;
 BOOL multi=false;
 
+#if !_REMOTE_SUPPORT
 void Enable_softwareCAD_elevated();
 void Enable_softwareCAD();
 void Reboot_in_safemode_elevated();
@@ -123,6 +131,7 @@ void delete_softwareCAD_elevated();
 void delete_softwareCAD();
 void Reboot_with_force_reboot_elevated();
 void Reboot_with_force_reboot();
+#endif
 void Shellexecuteforuiaccess();
 
 //HACK to use name in autoreconnect from service with dyn dns
@@ -291,8 +300,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		MessageBoxSecure(NULL, sz_ID_FAILED_INIT, szAppName, MB_OK);
 		return 0;
 	}
+
+#if !_REMOTE_SUPPORT
     // look up the current service name in the registry.
     GetServiceName(progname, service_name);
+#endif
 
 	// Make the command-line lowercase and parse it
 	size_t i;
@@ -317,12 +329,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			return 0;
 		}
 
+#if !_REMOTE_SUPPORT
 		if (strncmp(&szCmdLine[i], winvncStopserviceHelper, strlen(winvncStopserviceHelper)) == 0)
 		{
 			Sleep(3000);
 			Set_stop_service_as_admin();
 			return 0;
 		}
+#endif
 
 		if (strncmp(&szCmdLine[i], winvncKill, strlen(winvncKill)) == 0)
 		{
@@ -356,6 +370,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			return 0;
 		}
 
+#if !_REMOTE_SUPPORT
 		if (strncmp(&szCmdLine[i], winvncStartserviceHelper, strlen(winvncStartserviceHelper)) == 0)
 		{
 			Sleep(3000);
@@ -401,6 +416,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 				Reboot_with_force_reboot_elevated();
 				return 0;
 			}
+#endif
 
 		if (strncmp(&szCmdLine[i], winvncSecurityEditorHelper, strlen(winvncSecurityEditorHelper)) == 0)
 			{
@@ -438,6 +454,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			return 0;
 		}
 
+#if !_REMOTE_SUPPORT
 		if (strncmp(&szCmdLine[i], winvncSoftwarecad, strlen(winvncSoftwarecad)) == 0)
 		{
 			Enable_softwareCAD();
@@ -570,6 +587,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			if (!Myinit(hInstance)) return 0;
 			return WinVNCAppMain();
 		}
+#endif
 
 		if (strncmp(&szCmdLine[i], winvncSCexit, strlen(winvncSCexit)) == 0)
 		{
@@ -835,12 +853,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		break;
 	};
 
+#if !_REMOTE_SUPPORT
 	// If no arguments were given then just run
 	if (!argfound)
 	{
 		if (!Myinit(hInstance)) return 0;
 		return WinVNCAppMain();
 	}
+#else
+	// Remote support should always run as a user application
+	if (!Myinit(hInstance)) return 0;
+	return WinVNCAppMain();
+#endif
 
 	return 0;
 }

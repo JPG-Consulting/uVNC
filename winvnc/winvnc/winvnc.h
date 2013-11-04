@@ -72,6 +72,8 @@ extern char* g_szRepeaterHost;
 
 const char winvncSettingshelper[]		= "-settingshelper";
 const char winvncSettings[]				= "-settings";
+
+#if !_REMOTE_SUPPORT
 const char winvncStopserviceHelper[]	= "-stopservicehelper";
 const char winvncStopservice[]			= "-stopservice";
 const char winvncStartserviceHelper[]	= "-startservicehelper";
@@ -93,6 +95,7 @@ const char winvncRebootForceHelper[]	= "-rebootforcehelper";
 
 const char winvncdelSoftwarecad[]		= "-delsoftwarecad";
 const char winvncdelSoftwarecadHelper[]		= "-delsoftwarecadhelper";
+#endif
 
 const char winvncSecurityEditorHelper[]		= "-securityeditorhelper";
 const char winvncSecurityEditor[]			= "-securityeditor";

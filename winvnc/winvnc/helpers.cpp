@@ -33,10 +33,12 @@
 //	Runas is standard OS, so no security risk
 
 const char winvncSettings[]				= "-settings";
+#if !_REMOTE_SUPPORT
 const char winvncStopservice[]			= "-stopservice";
 const char winvncStartservice[]			= "-startservice";
 const char winvncInstallService[]		= "-install";
 const char winvncUnInstallService[]		= "-uninstall";
+#endif
 const char winvncSecurityEditor[]		= "-securityeditor";
 
 extern char service_name[];
@@ -337,6 +339,7 @@ Real_settings(char *mycommand)
 Copy_to_Secure_from_temp_helper(mycommand);
 }
 
+#if !_REMOTE_SUPPORT
 void
 Set_stop_service_as_admin()
 {
@@ -384,6 +387,7 @@ Set_start_service_as_admin()
 	shExecInfo.hInstApp = NULL;
 	ShellExecuteEx(&shExecInfo);
 }
+#endif
 
 void Open_homepage()
 {
@@ -395,6 +399,7 @@ void Open_forum()
 	ShellExecute(0, "open", "http://forum.uvnc.com", 0, 0, 1);
 }
 
+#if !_REMOTE_SUPPORT
 void
 Real_start_service()
 {
@@ -442,6 +447,7 @@ Set_uninstall_service_as_admin()
 	shExecInfo.hInstApp = NULL;
 	ShellExecuteEx(&shExecInfo);
 }
+#endif
 
 void
 winvncSecurityEditorHelper_as_admin()
@@ -467,6 +473,8 @@ void make_upper(std::string& str)
     // convert to uppercase
     std::transform(str.begin(), str.end(), str.begin(), toupper);//(int(*)(int))
 }
+
+#if !_REMOTE_SUPPORT
 //**************************************************************************
 // GetServiceName() looks up service by application path. If found, the function
 // fills pszServiceName (must be at least 256+1 characters long).
@@ -573,6 +581,9 @@ bool GetServiceName(TCHAR *pszAppPath, TCHAR *pszServiceName)
 
     return bResult;
 }
+#endif
+
+// TODO: Remote support shouldn't have Running from external service
 extern BOOL	m_fRunningFromExternalService;
 DWORD MessageBoxSecure(HWND hWnd,LPCTSTR lpText,LPCTSTR lpCaption,UINT uType)
 {

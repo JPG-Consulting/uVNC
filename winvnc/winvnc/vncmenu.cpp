@@ -88,10 +88,12 @@ static P_DwmEnableComposition pfnDwmEnableComposition = NULL;
 static BOOL AeroWasEnabled = FALSE;
 DWORD GetExplorerLogonPid();
 
+#if !_REMOTE_SUPPORT
 void Set_uninstall_service_as_admin();
 void Set_install_service_as_admin();
 void Set_stop_service_as_admin();
 void Set_start_service_as_admin();
+#endif
 
 DWORD GetCurrentSessionID();
 static unsigned int WM_TASKBARCREATED = 0;
@@ -101,12 +103,15 @@ void Open_forum();
 #define MSGFLT_ADD		1
 typedef BOOL (WINAPI *CHANGEWINDOWMESSAGEFILTER)(UINT message, DWORD dwFlag);
 
+#if !_REMOTE_SUPPORT
 void Enable_softwareCAD_elevated();
 void delete_softwareCAD_elevated();
 void Reboot_in_safemode_elevated();
 bool IsSoftwareCadEnabled();
 bool ISUACENabled();
 void Reboot_with_force_reboot_elevated();
+#endif
+
 //HACK to use name in autoreconnect from service with dyn dns
 extern char dnsname[255];
 
@@ -766,6 +771,9 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 			m_properties.AllowEditClients() ? MF_ENABLED : MF_GRAYED);
 			EnableMenuItem(m_hmenu, ID_OUTGOING_CONN,
 			m_properties.AllowEditClients() ? MF_ENABLED : MF_GRAYED);
+#if !_REMOTE_SUPPORT
+			// No service mode in Remote Support
+
 			if (vncService::RunningAsService() && !vncService::IsInstalled())
 			{
 				//service is already disabled, but this winvnc was still started from the service
@@ -777,6 +785,7 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 			EnableMenuItem(m_hmenu, ID_UNINSTALL_SERVICE,(vncService::IsInstalled()&&m_properties.AllowShutdown()) ? MF_ENABLED : MF_GRAYED);
 			EnableMenuItem(m_hmenu, ID_REBOOTSAFEMODE,(vncService::RunningAsService()&&m_properties.AllowShutdown()) ? MF_ENABLED : MF_GRAYED);
 			EnableMenuItem(m_hmenu, ID_REBOOT_FORCE,(vncService::RunningAsService()&&m_properties.AllowShutdown()) ? MF_ENABLED : MF_GRAYED);
+#endif
 			OSVERSIONINFO OSversion;	
 			OSversion.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
 			GetVersionEx(&OSversion);
@@ -819,7 +828,7 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 				RemoveMenu(m_hmenu, ID_SOFTWARECAD, MF_BYCOMMAND);
 			}
 
-
+#if !_REMOTE_SUPPORT
 			// adzm 2009-07-05
 			if (SPECIAL_SC_PROMPT) {
 				RemoveMenu(m_hmenu, ID_ADMIN_PROPERTIES, MF_BYCOMMAND);
@@ -833,6 +842,7 @@ vncMenu::SendTrayMsg(DWORD msg, BOOL flash)
 				RemoveMenu(m_hmenu, ID_SOFTWARECAD, MF_BYCOMMAND);
 				RemoveMenu(m_hmenu, ID_DELSOFTWARECAD, MF_BYCOMMAND);
 			}
+#endif
 
 			if (msg == NIM_ADD)
 			{
@@ -1153,6 +1163,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			_this->m_server->KillAuthClients();
 			PostMessage(hwnd, WM_CLOSE, 0, 0);
 			break;
+
+#if !_REMOTE_SUPPORT
 		case ID_SOFTWARECAD:
 			{
 			HANDLE hProcess,hPToken;
@@ -1520,7 +1532,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				}
 			}
 			break;
-
+#endif
 		}
 		return 0;
 

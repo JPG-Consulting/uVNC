@@ -440,6 +440,7 @@ BEGIN
         MENUITEM "&Kill All Clients",           ID_KILLCLIENTS
         MENUITEM SEPARATOR
         MENUITEM "&List All Clients",           ID_LISTCLIENTS
+#ifndef _REMOTE_SUPPORT
         MENUITEM SEPARATOR
         MENUITEM "Install Service",             ID_RUNASSERVICE
         MENUITEM "Uninstall Service",           ID_UNINSTALL_SERVICE
@@ -449,6 +450,7 @@ BEGIN
         MENUITEM "Fix2 SoftwareCad",            ID_DELSOFTWARECAD
         MENUITEM "Reboot in safemode",          ID_REBOOTSAFEMODE
         MENUITEM "Force Reboot (unsafe)",       ID_REBOOT_FORCE
+#endif
         MENUITEM SEPARATOR
         MENUITEM "&Close VNC Connections",      ID_CLOSE
     END

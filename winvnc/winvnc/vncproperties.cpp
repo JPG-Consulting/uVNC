@@ -244,16 +244,20 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 		CloseHandle(hPToken);
 		return;
 		}*/
-
+#if !_REMOTE_SUPPORT
 	if (m_fUseRegistry)
 	{
 		if (vncService::RunningAsService()) usersettings=false;
 		m_usersettings=usersettings;
 	}
+#else
+	m_usersettings=false;
+#endif
 
 	if (show)
 	{
 
+#if !_REMOTE_SUPPORT
 		if (!m_fUseRegistry) // Use the ini file
 		{
 			// We're trying to edit the default local settings - verify that we can
@@ -315,10 +319,12 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 				}
 			}
 		}
+#endif
 
 		// Now, if the dialog is not already displayed, show it!
 		if (!m_dlgvisible)
 		{
+#if !_REMOTE_SUPPORT
 			if (m_fUseRegistry) 
 			{
 				if (usersettings)
@@ -330,7 +336,7 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 				//Load(usersettings);
 				m_usersettings=usersettings;
 			}
-
+#endif
 			for (;;)
 			{
 				m_returncode_valid = FALSE;
@@ -359,6 +365,9 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 					return;
 				}
 
+#if !_REMOTE_SUPPORT
+				// Remote support does not require a password!
+
 				// We're allowed to exit if the password is not empty
 				char passwd[MAXPWLEN];
 				m_server->GetPassword(passwd);
@@ -385,20 +394,27 @@ vncProperties::ShowAdmin(BOOL show, BOOL usersettings)
 				// If we reached here then OK was used & there is no password!
 				int result2 = MessageBoxSecure(NULL, sz_ID_NO_PASSWORD_WARN,
 				    sz_ID_WINVNC_WARNIN, MB_OK | MB_ICONEXCLAMATION);
-
+#else
+				break;
+#endif
 				omni_thread::sleep(4);
 			}
 
 			// Load in all the settings
 			// If you run as service, you reload the saved settings before they are actual saved
 			// via runas.....
+#if !_REMOTE_SUPPORT
 			if (!vncService::RunningAsService())
 			{
-			if (m_fUseRegistry) 
-				Load(TRUE);
-			else
-				LoadFromIniFile();
+				if (m_fUseRegistry) 
+					Load(TRUE);
+				else
+					LoadFromIniFile();
 			}
+#else
+			// Remote support only supports INI files
+			LoadFromIniFile();
+#endif
 
 		}
 	}
