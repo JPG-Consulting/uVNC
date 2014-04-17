@@ -3350,6 +3350,20 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 
 	switch (uMsg)
 	{
+	case WM_DROPFILES:
+	{
+			// Adds ability for user to drag and drop 
+			// a directory to the source files pane for quicker navigation to deep directories.
+			 TCHAR lpszFile[MAX_PATH] = { 0 };
+			 lpszFile[0] = '\0';
+			 DragQueryFile((HDROP)wParam, 0, lpszFile, MAX_PATH);
+					 
+			strcat(lpszFile, "\\");
+
+			 _this->PopulateLocalListBox(hWnd, lpszFile);
+					 
+			 break;
+	}
 	case WM_TIMER:
 		{
 			// We have to wait for NetBuf flush
@@ -3392,6 +3406,9 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 
 			SetForegroundWindow(hWnd);
 
+			// Register drag and drop message handling
+			DragAcceptFiles(hWnd,true);
+			
 			// Set the title 
 			const long lTitleBufSize=256;			
 			char szRemoteName[lTitleBufSize];
